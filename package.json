@@ -1,0 +1,29 @@
+{
+  "name": "second-hand-marketplace",
+  "version": "1.0.0",
+  "description": "Student Second-Hand Marketplace Platform with real-time availability and appointment booking",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others-on-fail --names \"BACKEND,FRONTEND\" -c \"bgBlue.bold,bgGreen.bold\" \"npm:backend:dev\" \"npm:frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:dev": "cd frontend && npm start",
+    "build": "npm run backend:build && npm run frontend:build",
+    "backend:build": "cd backend && npm run build",
+    "frontend:build": "cd frontend && npm run build",
+    "test": "npm run backend:test && npm run frontend:test",
+    "backend:test": "cd backend && npm test",
+    "frontend:test": "cd frontend && npm test",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String   @unique
+  firstName   String
+  lastName    String
+  password    String
+  verified    Boolean  @default(false)
+  avatar      String?
+  university  String?
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  items        Item[]
+  appointments Appointment[]
+  buyerAppointments Appointment[] @relation("BuyerAppointments")
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  category    String   // ELECTRONICS, FURNITURE, BOOKS, CLOTHING, SPORTS, APPLIANCES, DECORATIONS, OTHER
+  status      String   @default("AVAILABLE") // AVAILABLE, RESERVED, SOLD, PENDING_PICKUP
+  condition   String
+  images      String   // JSON string of image URLs
+  location    String?
+  tags        String   // JSON string of tags
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  sellerId     String
+  seller       User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+
+  @@map("items")
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  startTime   DateTime
+  endTime     DateTime
+  status      String   @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  location    String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  itemId   String
+  item     Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  sellerId String
+  seller   User   @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  buyerId  String
+  buyer    User   @relation("BuyerAppointments", fields: [buyerId], references: [id], onDelete: Cascade)
+
+  @@map("appointments")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // ITEM_STATUS_CHANGE, APPOINTMENT_BOOKED, APPOINTMENT_REMINDER, APPOINTMENT_CANCELLED, NEW_MESSAGE
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  metadata  String?  // JSON string for metadata
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model University {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  domain    String   @unique
+  country   String
+  city      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("universities")
+}
